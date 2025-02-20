@@ -15,11 +15,11 @@ import {
   UserPlusIcon,
 } from "vue-tabler-icons";
 const sidebarMenu = ref([
-  {
-    title: "Dashboard",
-    icon: LayoutDashboardIcon,
-    to: "/dashboard",
-  },
+//   {
+//     title: "Dashboard",
+//     icon: LayoutDashboardIcon,
+//     to: "/dashboard",
+//   },
 ]);
 const sidebarMenuAdmin = shallowRef(sidebarItems);
 const sDrawer = ref(true);
@@ -68,8 +68,8 @@ onMounted(() => {
         <div>
                 <ul v-auto-animate class="pt-2 m-1">
                     <li v-for="(item, i) in sidebarMenu" :key="i" @click="activeLink(item)"
-                        v-bind:class="item.title == selectedMenu && !item.expanded ? 'bg-gray-500 hover:bg-gray-500  ' : 'hover:bg-gray-500'"
-                        class="flex-col items-center text-white text-sm cursor-pointer py-3  
+                        v-bind:class="item.title == selectedMenu && !item.expanded ? 'bg-gray-500 text-white hover:bg-gray-500  ' : 'hover:bg-gray-500 hover:text-white'"
+                        class="flex-col items-center bg-gray-50 text-gray-600 text-sm cursor-pointer py-3  
                  rounded-md mt-2  px-3 duration-300 ">
 
                         <nuxt-link :to="!item.header && item.children == null ? `${item.to}` : '#'"

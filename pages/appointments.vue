@@ -154,6 +154,7 @@ function requestAppointment() {
         .then(res => {
             useToast().success(res.message);
             isSending.value = false
+            getAllAppointments()
         })
         .catch(err => {
             useToast().error(err.data.message);
@@ -204,7 +205,7 @@ const download = computed(() => {
                             prepend-inner-icon="mdi-magnify" single-line hide-details>
                         </v-text-field>
                     </v-col>
-                    <v-col class="flex" cols="12" md="4">
+                    <v-col class="flex" cols="12" md="3">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
                             <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
@@ -212,7 +213,7 @@ const download = computed(() => {
                             </v-btn>
                         </form>
                     </v-col>
-                    <v-col v-if="!showForm" class="flex" cols="12" md="2">
+                    <v-col v-if="!showForm" class="flex" cols="12" md="3">
                         <v-btn @click="isSending = true" prepend-icon="mdi-plus" color="primary" class="mx-2"
                             variant="tonal">
                             Request Appointment
@@ -309,7 +310,7 @@ const download = computed(() => {
                                 <v-btn v-if="itemToEdit?.status === '0'" :loading="btnLoading" elevation="10"
                                     variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
                                     @click="approveAppointment()">
-                                    ApproveRequest
+                                    Approve Request
                                 </v-btn>
                                 <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
                                     variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"

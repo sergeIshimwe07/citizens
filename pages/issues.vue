@@ -14,6 +14,7 @@ const token = localStorage.getItem("token")
 const search = ref("");
 const lists = ref([]);
 const categories = ref([]);
+const itemToEdit = ref(null)
 const showIssueForm = ref(false)
 const loading = ref(false)
 const headers: Header[] = [
@@ -205,6 +206,82 @@ const download = computed(() => {
                         </template>
                     </EasyDataTable>
                 </ClientOnly>
+            </UiParentCard>
+        </v-col>
+        <v-col cols="12" md="4" v-if="showForm">
+            <UiParentCard parent-title="Dashboard" title="Appointment Details" class="relative">
+                <div class="absolute top-4 right-4">
+                    <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showForm = false"></v-icon>
+                </div>
+                <div class="bg-white md:overflow-hidden">
+                    <div class="px-4">
+                        <div class="md:text-left">
+                            <p v-if="itemToEdit?.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
+                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please select date and time
+                                for the appointment to approve it. If it is exprired or not available, please close it.
+                            </p>
+                            <p v-if="itemToEdit?.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
+                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now allowed to close it.
+                            </p>
+                            <p v-else class="text-left text-sm text-gray-600 md:mb-5">
+                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>
+                            </p>
+                            <div  v-if="itemToEdit?.status === '0'">
+                                <form class="mx-auto mb-3">
+                                    <label for="time" class="block mb-2 text-sm font-medium text-gray-900">Select
+                                        time:</label>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd"
+                                                    d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <input type="time" id="time" v-model="time"
+                                            class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700"
+                                            min="09:00" max="18:00" value="00:00" required />
+                                    </div>
+                                </form>
+                                <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn color="secondary" block v-bind="props">
+                                            {{ `Date: ${formattedStartDate}` }}
+                                        </v-btn>
+                                    </template>
+                                    <v-card min-width="300">
+                                        <v-date-picker v-model="startDate" hide-header show-adjacent-months></v-date-picker>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn color="primary" variant="text" @click="menu = false">
+                                                Close
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-menu>
+                            </div>
+                            <v-card-actions class="mt-5">
+                                <v-spacer></v-spacer>
+                                <v-btn color="primary" variant="outlined" class="mx-1" prepend-icon="mdi-close"
+                                    @click="showForm = false">
+                                    Cancel
+                                </v-btn>
+                                <v-btn v-if="itemToEdit?.status === '0'" :loading="btnLoading" elevation="10"
+                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
+                                    @click="approveAppointment()">
+                                    Approve Request
+                                </v-btn>
+                                <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
+                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
+                                    @click="requestAppointment()">
+                                    Close
+                                </v-btn>
+                            </v-card-actions>
+                        </div>
+                    </div>
+                </div>
             </UiParentCard>
         </v-col>
         <v-col cols="12" md="4" v-if="showIssueForm">
