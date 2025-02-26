@@ -2,24 +2,45 @@
 import { ref, shallowRef } from 'vue';
 import sidebarItems, { menu } from '@/components/layout/full/vertical-sidebar/sidebarItem';
 import {
-  HelpIcon,
-  BuildingStoreIcon,
-  ShoppingCartIcon,
-  TruckDeliveryIcon,
-  PackageIcon,
-  Map2Icon,
-  SteeringWheelIcon,
-  LayoutDashboardIcon,
-  LogoutIcon,
-  MoodHappyIcon,
-  UserPlusIcon,
+    HelpIcon,
+    BuildingStoreIcon,
+    ShoppingCartIcon,
+    TruckDeliveryIcon,
+    PackageIcon,
+    Map2Icon,
+    SteeringWheelIcon,
+    LayoutDashboardIcon,
+    LogoutIcon,
+    MoodHappyIcon,
+    UserPlusIcon,
 } from "vue-tabler-icons";
 const sidebarMenu = ref([
-//   {
-//     title: "Dashboard",
-//     icon: LayoutDashboardIcon,
-//     to: "/dashboard",
-//   },
+    {
+        title: "Residents",
+        icon: UserPlusIcon,
+        to: "/residents",
+    },
+    {
+        title: "Mentors",
+        icon: UserPlusIcon,
+        to: "/mentors",
+    },
+    { 
+        title: "Issues", 
+        icon: HelpIcon, 
+        to: "/issues" 
+    },
+    { 
+        title: "Appointments", 
+        icon: MoodHappyIcon, 
+        to: "/appointments" 
+    },
+    {
+        title: "Users",
+        icon: UserPlusIcon,
+        to: "/users",
+    }
+
 ]);
 const sidebarMenuAdmin = shallowRef(sidebarItems);
 const sDrawer = ref(true);
@@ -50,7 +71,7 @@ onMounted(() => {
     let user = JSON.parse(localStorage.getItem("logger") || '{}');
     console.log(user)
     if (user.type == '3') {
-        sidebarMenu.value.push(...[{ title: "Issues", icon: HelpIcon, to: "/issues" },{ title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }])
+        sidebarMenu.value.push(...[{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }])
     }
 })
 </script>
@@ -66,27 +87,27 @@ onMounted(() => {
         <!---Navigation -->
         <!-- ---------------------------------------------- -->
         <div>
-                <ul v-auto-animate class="pt-2 m-1">
-                    <li v-for="(item, i) in sidebarMenu" :key="i" @click="activeLink(item)"
-                        v-bind:class="item.title == selectedMenu && !item.expanded ? 'bg-gray-500 text-white hover:bg-gray-500  ' : 'hover:bg-gray-500 hover:text-white'"
-                        class="flex-col items-center bg-gray-50 text-gray-600 text-sm cursor-pointer py-3  
+            <ul v-auto-animate class="pt-2 m-1">
+                <li v-for="(item, i) in sidebarMenu" :key="i" @click="activeLink(item)"
+                    v-bind:class="item.title == selectedMenu && !item.expanded ? 'bg-gray-500 text-white hover:bg-gray-500  ' : 'hover:bg-gray-500 hover:text-white'"
+                    class="flex-col items-center bg-gray-50 text-gray-600 text-sm cursor-pointer py-3  
                  rounded-md mt-2  px-3 duration-300 ">
 
-                        <nuxt-link :to="!item.header && item.children == null ? `${item.to}` : '#'"
-                            :class="sDrawer ? ' ' : 'justify-center'" class="flex items-center  gap-x-4 ">
-                            <component :is="item.icon" class="h-6 w-6 duration-200 block float-left cursor-pointer"
-                                :class="item.title == selectedMenu ? 'text-white' : ''" />
-                            <div class="flex-1 truncate duration-300 " :class="!sDrawer ? hidden : ``"
-                                v-bind:class="item.title == selectedMenu ? 'text- font-medium' : 'font-medium'">{{
-                                    item.title
-                                }}
-                            </div>
-                        </nuxt-link>
-                    </li>
-                </ul>
-                <div class="pa-4">
-                    <!-- <LayoutFullVerticalSidebarExtraBox/> -->
-                </div>
+                    <nuxt-link :to="!item.header && item.children == null ? `${item.to}` : '#'"
+                        :class="sDrawer ? ' ' : 'justify-center'" class="flex items-center  gap-x-4 ">
+                        <component :is="item.icon" class="h-6 w-6 duration-200 block float-left cursor-pointer"
+                            :class="item.title == selectedMenu ? 'text-white' : ''" />
+                        <div class="flex-1 truncate duration-300 " :class="!sDrawer ? hidden : ``"
+                            v-bind:class="item.title == selectedMenu ? 'text- font-medium' : 'font-medium'">{{
+                                item.title
+                            }}
+                        </div>
+                    </nuxt-link>
+                </li>
+            </ul>
+            <div class="pa-4">
+                <!-- <LayoutFullVerticalSidebarExtraBox/> -->
+            </div>
         </div>
 
     </v-navigation-drawer>

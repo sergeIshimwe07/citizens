@@ -13,20 +13,23 @@ const config = useRuntimeConfig()
 const token = localStorage.getItem("token")
 const search = ref("");
 const lists = ref([]);
-const categories = ref([]);
+const appointmentTypes = ref([]);
+const residents = ref([])
 const showForm = ref(false)
 const loading = ref(false)
 const btnLoading = ref(false)
 const menu = ref(false)
 const isSending = ref(false)
-const menu2 = ref(false)
+const resident = ref<any>("")
+const mentorType = ref<any>("")
 const time = ref("")
-const itemToEdit = ref(null)
+const itemToEdit = ref<any>(null)
 const headers: Header[] = [
     { text: "Citizen", value: "citizen", sortable: true },
     { text: "Date", value: "date", sortable: true },
     { text: "Time", value: "time", sortable: true },
     { text: "Date", value: "created_at", sortable: true },
+    { text: "Type", value: "type", sortable: true },
     { text: "Status", value: "status", sortable: true },
     { text: "Action", value: "action", sortable: false },
 ]
@@ -80,36 +83,6 @@ const {
         $rules: [rules.required("Please select a category")],
     },
 });
-async function handleSubmit() {
-    try {
-        dataLoading.value = true;
-        const formData = await validateFields();
-
-        await http.fetch("createIssue", {
-            method: "post",
-            body: {
-                title: form.title.$value,
-                details: form.details.$value,
-                category_id: form.category_id.$value,
-            }
-        })
-            .then(res => {
-                useToast().success(res.message);
-                resetFields();
-                showForm.value = false
-                getAllAppointments()
-            })
-            .catch(err => {
-                useToast().error(err.data.message);
-            })
-            .finally(() => {
-                dataLoading.value = false;
-
-            });
-    } catch (e) {
-        dataLoading.value = false;
-    }
-}
 const statusStr = (status: string) => {
     if (status == "1") {
         return "Active";
@@ -149,7 +122,14 @@ function getAllAppointments() {
 function requestAppointment() {
     btnLoading.value = true
     http.fetch("createAppointment", {
-        method: "get",
+        method: "post",
+        body: {
+            type: mentorType.value,
+            residents: resident.value,
+            date: formattedStartDate.value,
+            time: time.value,
+            status: 0
+        }
     })
         .then(res => {
             useToast().success(res.message);
@@ -163,15 +143,50 @@ function requestAppointment() {
             btnLoading.value = false
         })
 }
-function approveAppointment() {
+
+function setAppointmentMentor() {
     btnLoading.value = true
+    http.fetch("createAppointment", {
+        method: "post",
+        body: {
+            type: mentorType.value,
+            residents: resident.value,
+            date: formattedStartDate.value,
+            time: time.value,
+            status: 0
+        }
+    })
+        .then(res => {
+            useToast().success(res.message);
+            isSending.value = false
+            getAllAppointments()
+        })
+        .catch(err => {
+            useToast().error(err.data.message);
+        })
+        .finally(() => {
+            btnLoading.value = false
+        })
+}
+
+function approveAppointment(status = 1) {
+    btnLoading.value = true
+    let temp = {
+        date: "",
+        time: "",
+        citizen_id: "",
+        id: itemToEdit.value.id,
+        status
+    }
+    if(status === 1) {
+        temp.date = formattedStartDate.value
+        temp.time = time.value
+        temp.citizen_id = resident.value
+    }
     http.fetch("updateAppointment", {
         method: "post",
         body: {
-            id: itemToEdit.value.id,
-            date: formattedStartDate.value,
-            time: time.value,
-            status: 1
+            ...temp
         }
     })
         .then(res => {
@@ -186,9 +201,36 @@ function approveAppointment() {
             btnLoading.value = false
         })
 }
+// get all residents
+const getResidents = () => {
+    http.fetch("getResidents", {
+        method: "get",
+    })
+        .then(res => {
+            residents.value = res
+        })
+        .catch(err => {
+            useToast().error(err.data.message);
+        })
+}
+// get all appointment types
+const getAppointmentTypes = () => {
+    http.fetch("getAppointmentTypes", {
+        method: "get",
+    })
+        .then(res => {
+            appointmentTypes.value = res
+        })
+        .catch(err => {
+            useToast().error(err.data.message);
+        })
+}
+
 
 onMounted(() => {
     getAllAppointments()
+    getAppointmentTypes()
+    getResidents()
 })
 const download = computed(() => {
     return config.public.apiUrl + "getAttendance/1/0/" + token
@@ -255,25 +297,35 @@ const download = computed(() => {
                 <div class="bg-white md:overflow-hidden">
                     <div class="px-4">
                         <div class="md:text-left">
-                            <p v-if="itemToEdit.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please select date and time
+                            <p v-if="itemToEdit?.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
+                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please
+                                select date
+                                and time
                                 for the appointment to approve it. If it is exprired or not available, please close it.
                             </p>
-                            <p v-if="itemToEdit.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now allowed to close it.
+                            <p v-if="itemToEdit?.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
+                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now
+                                allowed
+                                to close it.
                             </p>
                             <p v-else class="text-left text-sm text-gray-600 md:mb-5">
                                 This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>
                             </p>
-                            <div  v-if="itemToEdit?.status === '0'">
+                            <div v-if="!itemToEdit || itemToEdit?.status === '0'">
                                 <form class="mx-auto mb-3">
+                                    <!-- autocomplete to select resident -->
+                                    <label for="resident">Resident</label>
+                                    <v-autocomplete :items="residents" v-model="resident" dense outlined
+                                        item-title="names" item-value="id" label="Select resident"
+                                        multiple></v-autocomplete>
                                     <label for="time" class="block mb-2 text-sm font-medium text-gray-900">Select
                                         time:</label>
                                     <div class="relative">
                                         <div
                                             class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
                                             <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path fill-rule="evenodd"
                                                     d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
                                                     clip-rule="evenodd" />
@@ -291,7 +343,8 @@ const download = computed(() => {
                                         </v-btn>
                                     </template>
                                     <v-card min-width="300">
-                                        <v-date-picker v-model="startDate" hide-header show-adjacent-months></v-date-picker>
+                                        <v-date-picker v-model="startDate" hide-header
+                                            show-adjacent-months></v-date-picker>
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
                                             <v-btn color="primary" variant="text" @click="menu = false">
@@ -317,6 +370,35 @@ const download = computed(() => {
                                     @click="requestAppointment()">
                                     Close
                                 </v-btn>
+                                <v-menu>
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
+                                            class="mx-1" prepend-icon="mdi-delete">
+                                            Change Issue status
+                                        </v-btn>
+                                    </template>
+
+                                    <v-list>
+                                        <v-list-item @click="approveAppointment(1)" v-if="itemToEdit.status !== 0">
+                                            <v-list-item-title>Approve</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="approveAppointment(2)">
+                                            <v-list-item-title>Mark completed</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="approveAppointment(3)">
+                                            <v-list-item-title>Appointment Expired</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="approveAppointment(4)">
+                                            <v-list-item-title>Appointment missed</v-list-item-title>
+                                        </v-list-item>
+
+                                    </v-list>
+                                </v-menu>
+                                <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
+                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
+                                    @click="setAppointmentMentor()">
+                                    Create Appointment  
+                                </v-btn>
                             </v-card-actions>
                         </div>
                     </div>
@@ -329,6 +411,12 @@ const download = computed(() => {
                 <v-card-text>
                     <div class="text-lg text-start justify-start">
                         Note that appointment date and will be set as confirmation. You'll need to check here
+                    </div>
+                    <div>
+                        <label for="mentorType" class="text-gray-700 text-sm">Mentorship Type</label>
+                        <v-select density="compact" variant="outlined"
+                            v-model="mentorType" :items="appointmentTypes" item-title="title" item-value="id"
+                            label="Select mentor type" single-line></v-select>
                     </div>
                 </v-card-text>
                 <v-card-actions class="mt-5">

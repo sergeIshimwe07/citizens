@@ -14,8 +14,10 @@ const token = localStorage.getItem("token")
 const search = ref("");
 const lists = ref([]);
 const categories = ref([]);
-const itemToEdit = ref(null)
+const itemToEdit = ref<any>(null)
 const showIssueForm = ref(false)
+const showDetails = ref(false)
+const btnLoading = ref(false)
 const loading = ref(false)
 const headers: Header[] = [
     { text: "Citizen", value: "citizen", sortable: true },
@@ -141,6 +143,29 @@ function getAllIssues() {
             loading.value = false
         })
 }
+//get change issue status
+function changeIssueStatus(status = 1) {
+    btnLoading.value = true
+    http.fetch("changeIssueStatus", {
+        method: "post",
+        body: {
+            id: itemToEdit.value.id,
+            status
+        }
+    })
+        .then(res => {
+            useToast().success(res.message)
+            showDetails.value = false
+            getAllIssues()
+        })
+        .catch(err => {
+            useToast().error(err.data.message)
+        })
+        .finally(() => {
+            btnLoading.value = false
+        })
+}
+
 function getIssueCategories() {
     http.fetch("getIssueCategories")
         .then(res => {
@@ -193,9 +218,9 @@ const download = computed(() => {
                             </v-chip>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showForm = true"
+                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" @click="showForm = true" icon="mdi-delete-forever"
+                            <v-icon color="red-darken-3" @click="showDetails = true" icon="mdi-delete-forever"
                                 size="large"></v-icon>
                         </template>
                         <template #empty-message>
@@ -208,76 +233,46 @@ const download = computed(() => {
                 </ClientOnly>
             </UiParentCard>
         </v-col>
-        <v-col cols="12" md="4" v-if="showForm">
-            <UiParentCard parent-title="Dashboard" title="Appointment Details" class="relative">
+        <v-col cols="12" md="4" v-if="showDetails">
+            <UiParentCard parent-title="Dashboard" :title="itemToEdit?.title" class="relative">
                 <div class="absolute top-4 right-4">
-                    <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showForm = false"></v-icon>
+                    <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showDetails = false"></v-icon>
                 </div>
                 <div class="bg-white md:overflow-hidden">
                     <div class="px-4">
                         <div class="md:text-left">
-                            <p v-if="itemToEdit?.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please select date and time
-                                for the appointment to approve it. If it is exprired or not available, please close it.
+                            <p class="text-left text-sm text-gray-600 md:mb-5">
+                                {{ itemToEdit?.details }}
                             </p>
-                            <p v-if="itemToEdit?.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now allowed to close it.
-                            </p>
-                            <p v-else class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>
-                            </p>
-                            <div  v-if="itemToEdit?.status === '0'">
-                                <form class="mx-auto mb-3">
-                                    <label for="time" class="block mb-2 text-sm font-medium text-gray-900">Select
-                                        time:</label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd"
-                                                    d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <input type="time" id="time" v-model="time"
-                                            class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700"
-                                            min="09:00" max="18:00" value="00:00" required />
-                                    </div>
-                                </form>
-                                <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
-                                    <template v-slot:activator="{ props }">
-                                        <v-btn color="secondary" block v-bind="props">
-                                            {{ `Date: ${formattedStartDate}` }}
-                                        </v-btn>
-                                    </template>
-                                    <v-card min-width="300">
-                                        <v-date-picker v-model="startDate" hide-header show-adjacent-months></v-date-picker>
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn color="primary" variant="text" @click="menu = false">
-                                                Close
-                                            </v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-menu>
-                            </div>
                             <v-card-actions class="mt-5">
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" variant="outlined" class="mx-1" prepend-icon="mdi-close"
-                                    @click="showForm = false">
+                                    @click="showDetails = false">
                                     Cancel
                                 </v-btn>
-                                <v-btn v-if="itemToEdit?.status === '0'" :loading="btnLoading" elevation="10"
-                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
-                                    @click="approveAppointment()">
-                                    Approve Request
-                                </v-btn>
-                                <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
-                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
-                                    @click="requestAppointment()">
-                                    Close
-                                </v-btn>
+                                <v-menu>
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
+                                            class="mx-1" prepend-icon="mdi-delete">
+                                            Change Issue status
+                                        </v-btn>
+                                    </template>
+
+                                    <v-list>
+                                        <v-list-item @click="changeIssueStatus(1)" v-if="itemToEdit.status !== 1">
+                                            <v-list-item-title>{{ itemToEdit.status === 0 ? 'Activate' :
+                                                'Reopen'}}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="changeIssueStatus(2)">
+                                            <v-list-item-title>Close Issue</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="changeIssueStatus(0)">
+                                            <v-list-item-title>Deactivate</v-list-item-title>
+                                        </v-list-item>
+
+                                    </v-list>
+                                </v-menu>
+
                             </v-card-actions>
                         </div>
                     </div>
