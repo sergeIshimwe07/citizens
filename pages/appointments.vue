@@ -87,7 +87,11 @@ const statusStr = (status: string) => {
     if (status == "1") {
         return "Active";
     } else if (status == "2") {
-        return "Closed";
+        return "Completed";
+    } else if (status == "3") {
+        return "Missed";
+    } else if (status == "4") {
+        return "Cancelled";
     } else {
         return "Pending";
     }
@@ -96,9 +100,13 @@ const statusClr = (status: string) => {
     if (status == "1") {
         return "success";
     } else if (status == "2") {
+        return "info";
+    } else if (status == "3") {
         return "error";
-    } else {
+    } else if (status == "4") {
         return "warning";
+    } else {
+        return "primary";
     }
 }
 
@@ -153,7 +161,7 @@ function setAppointmentMentor() {
             residents: resident.value,
             date: formattedStartDate.value,
             time: time.value,
-            status: 0
+            status: 1
         }
     })
         .then(res => {
@@ -215,7 +223,7 @@ const getResidents = () => {
 }
 // get all appointment types
 const getAppointmentTypes = () => {
-    http.fetch("getAppointmentTypes", {
+    http.fetch("getMentorshipTypes", {
         method: "get",
     })
         .then(res => {
@@ -255,8 +263,8 @@ const download = computed(() => {
                             </v-btn>
                         </form>
                     </v-col>
-                    <v-col v-if="!showForm" class="flex" cols="12" md="3">
-                        <v-btn @click="isSending = true" prepend-icon="mdi-plus" color="primary" class="mx-2"
+                    <v-col v-if="!showForm && (user?.type == '4' || user?.type == '3')" class="flex" cols="12" md="3">
+                        <v-btn @click="user?.type == '4' ? isSending = true : showForm = true" prepend-icon="mdi-plus" color="primary" class="mx-2"
                             variant="tonal">
                             Request Appointment
                         </v-btn>
@@ -289,7 +297,7 @@ const download = computed(() => {
                 </ClientOnly>
             </UiParentCard>
         </v-col>
-        <v-col cols="12" md="4" v-if="showForm">
+        <v-col cols="12" md="4" v-if="showForm && user?.type === '3'">
             <UiParentCard parent-title="Dashboard" title="Appointment Details" class="relative">
                 <div class="absolute top-4 right-4">
                     <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showForm = false"></v-icon>
@@ -297,27 +305,36 @@ const download = computed(() => {
                 <div class="bg-white md:overflow-hidden">
                     <div class="px-4">
                         <div class="md:text-left">
-                            <p v-if="itemToEdit?.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please
-                                select date
-                                and time
-                                for the appointment to approve it. If it is exprired or not available, please close it.
-                            </p>
-                            <p v-if="itemToEdit?.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now
-                                allowed
-                                to close it.
-                            </p>
-                            <p v-else class="text-left text-sm text-gray-600 md:mb-5">
-                                This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>
-                            </p>
+                            <div v-if="itemToEdit">
+                                <p v-if="itemToEdit?.status === '0'" class="text-left text-sm text-gray-600 md:mb-5">
+                                    This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. Please
+                                    select date
+                                    and time
+                                    for the appointment to approve it. If it is exprired or not available, please close it.
+                                </p>
+                                <p v-else-if="itemToEdit?.status === '1'" class="text-left text-sm text-gray-600 md:mb-5">
+                                    This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>. You are now
+                                    allowed
+                                    to close it.
+                                </p>
+                                <p v-else class="text-left text-sm text-gray-600 md:mb-5">
+                                    This is appointment request from <strong>{{ itemToEdit?.citizen }}</strong>
+                                </p>
+                            </div>
+                            <div v-else>
+                                <p class="text-left text-sm text-gray-600 md:mb-5">
+                                    You are about to create a new appointment. Please select resident, date and time for the
+                                    appointment.
+                                </p>
+                            </div>
                             <div v-if="!itemToEdit || itemToEdit?.status === '0'">
                                 <form class="mx-auto mb-3">
                                     <!-- autocomplete to select resident -->
-                                    <label for="resident">Resident</label>
-                                    <v-autocomplete :items="residents" v-model="resident" dense outlined
-                                        item-title="names" item-value="id" label="Select resident"
-                                        multiple></v-autocomplete>
+                                     <div v-if="!itemToEdit">
+                                         <label for="resident">Resident</label>
+                                         <v-autocomplete :items="residents" class="mt-2" v-model="resident" density="compact" variant="outlined"
+                                             item-title="names" item-value="id" label="Select resident"></v-autocomplete>
+                                     </div>
                                     <label for="time" class="block mb-2 text-sm font-medium text-gray-900">Select
                                         time:</label>
                                     <div class="relative">
@@ -360,17 +377,7 @@ const download = computed(() => {
                                     @click="showForm = false">
                                     Cancel
                                 </v-btn>
-                                <v-btn v-if="itemToEdit?.status === '0'" :loading="btnLoading" elevation="10"
-                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
-                                    @click="approveAppointment()">
-                                    Approve Request
-                                </v-btn>
-                                <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
-                                    variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
-                                    @click="requestAppointment()">
-                                    Close
-                                </v-btn>
-                                <v-menu>
+                                <v-menu v-if="itemToEdit?.status === '0' || itemToEdit?.status === '1'">
                                     <template v-slot:activator="{ props }">
                                         <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
                                             class="mx-1" prepend-icon="mdi-delete">
@@ -386,15 +393,15 @@ const download = computed(() => {
                                             <v-list-item-title>Mark completed</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item @click="approveAppointment(3)">
-                                            <v-list-item-title>Appointment Expired</v-list-item-title>
+                                            <v-list-item-title>Appointment Missed</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item @click="approveAppointment(4)">
-                                            <v-list-item-title>Appointment missed</v-list-item-title>
+                                            <v-list-item-title>Cancel Appointment</v-list-item-title>
                                         </v-list-item>
 
                                     </v-list>
                                 </v-menu>
-                                <v-btn v-if="itemToEdit?.status === '1'" :loading="btnLoading" elevation="10"
+                                <v-btn v-if="!itemToEdit" :loading="btnLoading" elevation="10"
                                     variant="outlined" color="success" class="mx-1" prepend-icon="mdi-delete"
                                     @click="setAppointmentMentor()">
                                     Create Appointment  

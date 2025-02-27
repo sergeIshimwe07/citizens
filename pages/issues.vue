@@ -73,7 +73,7 @@ const {
         $rules: [rules.required("Please provide issue details")],
     },
     category_id: {
-        $value: 0,
+        $value: 1,
         $rules: [rules.required("Please select a category")],
     },
 });
@@ -203,7 +203,7 @@ const download = computed(() => {
                         </form>
                     </v-col>
                     <v-col class="flex" cols="12" md="3">
-                        <v-btn @click="showIssueForm = true" prepend-icon="mdi-plus" color="primary" class="mx-2"
+                        <v-btn @click="showIssueForm = true; showDetails = false" prepend-icon="mdi-plus" color="primary" class="mx-2"
                             variant="tonal">
                             New Issue
                         </v-btn>
@@ -218,9 +218,9 @@ const download = computed(() => {
                             </v-chip>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true"
+                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true; showIssueForm = false"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" @click="showDetails = true" icon="mdi-delete-forever"
+                            <v-icon color="red-darken-3"  icon="mdi-delete-forever"
                                 size="large"></v-icon>
                         </template>
                         <template #empty-message>
@@ -248,9 +248,9 @@ const download = computed(() => {
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" variant="outlined" class="mx-1" prepend-icon="mdi-close"
                                     @click="showDetails = false">
-                                    Cancel
+                                    Close
                                 </v-btn>
-                                <v-menu>
+                                <v-menu v-if="user.role === '2'" bottom left>
                                     <template v-slot:activator="{ props }">
                                         <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
                                             class="mx-1" prepend-icon="mdi-delete">
@@ -259,14 +259,14 @@ const download = computed(() => {
                                     </template>
 
                                     <v-list>
-                                        <v-list-item @click="changeIssueStatus(1)" v-if="itemToEdit.status !== 1">
-                                            <v-list-item-title>{{ itemToEdit.status === 0 ? 'Activate' :
+                                        <v-list-item @click="changeIssueStatus(1)" v-if="itemToEdit.status !== '1'">
+                                            <v-list-item-title>{{ itemToEdit.status === '0' ? 'Activate' :
                                                 'Reopen'}}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item @click="changeIssueStatus(2)">
+                                        <v-list-item v-if="itemToEdit.status !== '2'" @click="changeIssueStatus(2)">
                                             <v-list-item-title>Close Issue</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item @click="changeIssueStatus(0)">
+                                        <v-list-item v-if="itemToEdit.status !== '0'" @click="changeIssueStatus(0)">
                                             <v-list-item-title>Deactivate</v-list-item-title>
                                         </v-list-item>
 
@@ -279,7 +279,7 @@ const download = computed(() => {
                 </div>
             </UiParentCard>
         </v-col>
-        <v-col cols="12" md="4" v-if="showIssueForm">
+        <v-col cols="12" md="4" v-if="showIssueForm && user.role === '4'">
             <UiParentCard parent-title="Dashboard" title="Create Issue" class="relative">
                 <div class="absolute top-4 right-4">
                     <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showIssueForm = false"></v-icon>

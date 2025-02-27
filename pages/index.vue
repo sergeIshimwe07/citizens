@@ -8,8 +8,6 @@ const http = useHttpRequest()
 const state = ref(1)
 const dataLoading = ref(false)
 const email = ref("")
-const password = ref("")
-const confirmPassword = ref("")
 // handle success event
 const show = ref(false)
 function toggle(value: boolean) {
@@ -77,19 +75,15 @@ async function handleSubmit() {
 
   }
 }
-
-
-
-
-
 </script>
+
 <template>
   <div>
     <div class="bg-white md:overflow-hidden">
       <div class="px-4 py-20 md:py-4">
         <div class="md:max-w-6xl md:mx-auto">
           <div class="md:flex md:flex-wrap">
-            <div v-if="state == 1" class="md:w-1/2  md:text-left md:pt-28">
+            <div class="md:w-1/2  md:text-left md:pt-28">
               <h1 class="font-bold text-primary text-3xl md:text-5xl leading-tight mb-4">
                 Login
               </h1>
@@ -129,52 +123,8 @@ async function handleSubmit() {
                     Login</v-btn>
                 </div>
                 <v-row justify="center">
-                  <p class="mt-10 text-gray-700">Click <strong @click="state = 2" class="cursor-pointer text-black">here</strong> to register as Resident</p>
+                  <p class="mt-10 text-gray-700">Click <nuxt-link to="/register"><strong class="cursor-pointer text-black">here</strong></nuxt-link> to register as Resident</p>
                   <!-- <v-btn color="primary" size="large" flat variant="text">Forgot Password?</v-btn> -->
-                </v-row>
-              </form>
-            </div>
-            <div v-if="state == 2" class="md:w-1/2  md:text-left md:pt-28">
-              <h1 class="font-bold text-primary text-3xl md:text-5xl leading-tight mb-4">
-                Sign Up
-              </h1>
-              <p class="text-left md:text-xl text-gray-600 md:mb-12 mt-2">Fill this form to create resident account
-              </p>
-              <form @submit.prevent="createAccount" class="  md:text-sm md:pr-48">
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="names" id="names" v-model="email"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your full names ">
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="phone" id="phone" v-model="email"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter phone number">
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="email" id="email" v-model="email"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your email address">
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="isibo" id="isibo" v-model="email"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your isibo">
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="password" id="password" v-model="email"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Create your password">
-                </div>
-                <div class="my-4 flex items-center justify-end space-x-4">
-                  <v-btn @click.prevent="createAccount" :disabled="dataLoading" :loading="dataLoading" rounded="xl"
-                    color="primary" size="large" block flat>
-                    Create account</v-btn>
-
-                </div>
-                <v-row justify="center">
-                  <v-btn @click.prevent="state = 1" color="primary" size="large" variant="text">
-                    Back to Login</v-btn>
                 </v-row>
               </form>
             </div>

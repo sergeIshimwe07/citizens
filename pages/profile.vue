@@ -17,16 +17,16 @@
                                 </template>
 
                                 <v-list-item-title>{{
-                                    info.shop !== "" ? info.shop : info.user_name
+                                    info?.names
                                 }}</v-list-item-title>
 
                                 <v-list-item-subtitle class="text-13">Email:
                                     {{
-                                        info.user_name
+                                        info?.email
                                     }}</v-list-item-subtitle>
                                 <v-list-item-subtitle class="text-13">Phone:
                                     {{
-                                        info.phone
+                                        info?.phone
                                     }}</v-list-item-subtitle>
                             </v-list-item>
                         </div>

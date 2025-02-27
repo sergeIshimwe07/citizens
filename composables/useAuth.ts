@@ -23,11 +23,9 @@ export const useAuth = () => {
           body: { email, password, isDistrict },
         })
         .then((data: any) => {
-          console.log(data);
           localStorage.setItem("token", data.token);
           localStorage.setItem("logger", JSON.stringify(data));
-          navigateTo("/dashboard");
-          console.log("login succeed");
+          navigateTo(data.redirect);
         })
         .catch((data) => {
           useToast().error(data.data.message);

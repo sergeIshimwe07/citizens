@@ -14,11 +14,17 @@ const token = localStorage.getItem("token")
 const search = ref("");
 const lists = ref([]);
 const mentorTypes = ref([]);
-const types = ref([
-    { id: 1, name: "Admin" },
-    { id: 2, name: "Leader" },
-    { id: 3, name: "Mentor" },
-]);
+const types = computed(() => {
+    if (user.type == '1') {
+        return [{ id: 1, name: "Admin" },
+        { id: 2, name: "Leader" },
+        { id: 3, name: "Mentor" },]
+    }
+    if (user.type == '2') {
+        return [{ id: 3, name: "Mentor" },]
+    }
+    return []
+})
 const itemToEdit = ref(null)
 const showUserForm = ref(false)
 const loading = ref(false)
@@ -27,7 +33,6 @@ const headers: Header[] = [
     { text: "Phone", value: "phone", sortable: true },
     { text: "E-mail", value: "email", sortable: true },
     { text: "User Type", value: "type", sortable: true },
-    { text: "Village", value: "location", sortable: true },
     { text: "Status", value: "Status", sortable: true },
     { text: "Action", value: "action", sortable: false },
 ]
@@ -51,14 +56,12 @@ watch(startDate, () => {
         .padStart(2, "0")}-${startDate.value.getDate().toString().padStart(2, "0")}`;
 });
 
-const allowedDates = ref([])
 const dataLoading = ref(false);
 interface FormData {
     names: Field<string>;
     phone: Field<string>;
     email: Field<string>;
-    village: Field<string>;
-    idNumber: Field<number>;
+    idNumber: Field<number | string>;
     type: Field<number>;
     mentorType: Field<number>;
 }
@@ -84,20 +87,16 @@ const {
         $value: "",
         $rules: [rules.required("Please enter email address")],
     },
-    village: {
-        $value: "",
-        $rules: [rules.required("Please enter village")],
-    },
     idNumber: {
-        $value: 0,
+        $value: "",
         $rules: [rules.required("Please enter ID number")],
     },
     type: {
-        $value: 0,
+        $value: 1,
         $rules: [rules.required("Please select user type")],
     },
     mentorType: {
-        $value: 0,
+        $value: 1,
     }
 });
 
@@ -112,7 +111,6 @@ async function handleSubmit() {
                 names: form.names.$value,
                 phone: form.phone.$value,
                 email: form.email.$value,
-                village: form.village.$value,
                 idNumber: form.idNumber.$value,
                 type: form.type.$value,
                 mentorType: form.mentorType.$value
@@ -198,15 +196,7 @@ const download = computed(() => {
                             prepend-inner-icon="mdi-magnify" single-line hide-details>
                         </v-text-field>
                     </v-col>
-                    <v-col class="flex" cols="12" md="2">
-                        <form :action="download" method="post" target="_blank">
-                            <input type="hidden" v-model="formattedStartDate">
-                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
-                                Export
-                            </v-btn>
-                        </form>
-                    </v-col>
-                    <v-col class="flex" cols="12" md="3">
+                    <v-col class="flex" cols="12" md="5">
                         <v-btn @click="showUserForm = true" prepend-icon="mdi-plus" color="primary" class="mx-2"
                             variant="tonal">
                             New User
@@ -248,7 +238,6 @@ const download = computed(() => {
                             <p class="text-left text-sm text-gray-600 md:mb-12 ">
                                 Create new User
                             </p>
-
                             <form @submit.prevent="handleSubmit" class="md:text-sm">
                                 <div class="flex flex-col my-4 group">
                                     <label for="names" class="text-gray-700 text-sm">Full Names</label>
@@ -276,16 +265,6 @@ const download = computed(() => {
                                         placeholder="Enter email address">
                                     <FormErrors :errors="form.email.$errors" class="p-error" />
                                 </div>
-
-                                <div class="flex flex-col my-4 group">
-                                    <label for="village" class="text-gray-700 text-sm">Village</label>
-                                    <input type="text" id="village" v-model="form.village.$value"
-                                        @blur="form.village.$validate()"
-                                        class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                                        placeholder="Enter village">
-                                    <FormErrors :errors="form.village.$errors" class="p-error" />
-                                </div>
-
                                 <div class="flex flex-col my-4 group">
                                     <label for="idNumber" class="text-gray-700 text-sm">ID Number</label>
                                     <input type="number" id="idNumber" v-model="form.idNumber.$value"

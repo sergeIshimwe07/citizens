@@ -12,7 +12,7 @@ export default defineComponent({
     const route = useRoute();
     const title = route.meta.title === undefined ? '' : `- ${route.meta.title}`
     useHead({
-      title: `Ecommerce ${title}`
+      title: `VIMMS | ${title}`
     });
   },
   beforeMount() {

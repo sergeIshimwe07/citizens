@@ -14,38 +14,11 @@ import {
     MoodHappyIcon,
     UserPlusIcon,
 } from "vue-tabler-icons";
-const sidebarMenu = ref([
-    {
-        title: "Residents",
-        icon: UserPlusIcon,
-        to: "/residents",
-    },
-    {
-        title: "Mentors",
-        icon: UserPlusIcon,
-        to: "/mentors",
-    },
-    { 
-        title: "Issues", 
-        icon: HelpIcon, 
-        to: "/issues" 
-    },
-    { 
-        title: "Appointments", 
-        icon: MoodHappyIcon, 
-        to: "/appointments" 
-    },
-    {
-        title: "Users",
-        icon: UserPlusIcon,
-        to: "/users",
-    }
-
-]);
+const sidebarMenu = ref<any>([]);
 const sidebarMenuAdmin = shallowRef(sidebarItems);
 const sDrawer = ref(true);
-let selectedMenu = ref('Dashboard')
-let selectedSubMenu = ref('Faculity')
+let selectedMenu = ref('')
+let selectedSubMenu = ref('')
 const openSubmenu = ref(false)
 
 if (process.client) {
@@ -70,8 +43,19 @@ function activeSubLink(title: any) {
 onMounted(() => {
     let user = JSON.parse(localStorage.getItem("logger") || '{}');
     console.log(user)
-    if (user.type == '3') {
-        sidebarMenu.value.push(...[{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }])
+
+    if (user.type == '4') {
+        selectedMenu.value = "Issues"
+        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }]
+    } else if(user.type == '3') {
+        selectedMenu.value = "Appointments"
+        sidebarMenu.value = [ { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }, { title: "Residents", icon: HelpIcon, to: "/residents" } ]
+    } else if(user.type == '2') {
+        selectedMenu.value = "Issues"
+        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Residents", icon: HelpIcon, to: "/residents" } ]
+    } else if(user.type == '1') {
+        selectedMenu.value = "Issues"
+        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" },{ title: "Residents", icon: HelpIcon, to: "/residents" } ,{ title: "Users", icon: HelpIcon, to: "/users" } ]
     }
 })
 </script>
