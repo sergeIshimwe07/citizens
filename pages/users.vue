@@ -34,7 +34,7 @@ const headers: Header[] = [
     { text: "E-mail", value: "email", sortable: true },
     { text: "User Type", value: "type", sortable: true },
     { text: "Status", value: "Status", sortable: true },
-    { text: "Action", value: "action", sortable: false },
+    // { text: "Action", value: "action", sortable: false },
 ]
 const user: any = JSON.parse(localStorage.getItem("logger"))
 

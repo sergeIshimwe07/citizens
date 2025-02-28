@@ -18,7 +18,7 @@
 
                                 <v-list-item-title>{{
                                     info?.names
-                                }}</v-list-item-title>
+                                    }}</v-list-item-title>
 
                                 <v-list-item-subtitle class="text-13">Email:
                                     {{
@@ -109,7 +109,7 @@
         </v-row>
     </div>
 </template>
-  
+
 <script setup lang="ts">
 import { onMounted } from "vue";
 
@@ -164,4 +164,3 @@ function changePassword() {
 }
 
 </script>
-  

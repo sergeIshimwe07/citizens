@@ -197,9 +197,9 @@ const download = computed(() => {
                     <v-col class="flex" cols="12" md="2">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
-                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
+                            <!-- <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
                                 Export
-                            </v-btn>
+                            </v-btn> -->
                         </form>
                     </v-col>
                     <v-col class="flex" cols="12" md="3">
@@ -220,8 +220,8 @@ const download = computed(() => {
                         <template #item-action="item">
                             <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true; showIssueForm = false"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3"  icon="mdi-delete-forever"
-                                size="large"></v-icon>
+                            <!-- <v-icon color="red-darken-3"  icon="mdi-delete-forever"
+                                size="large"></v-icon> -->
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">
@@ -279,7 +279,7 @@ const download = computed(() => {
                 </div>
             </UiParentCard>
         </v-col>
-        <v-col cols="12" md="4" v-if="showIssueForm && user.role === '4'">
+        <v-col cols="12" md="4" v-if="showIssueForm && user.type == '4'">
             <UiParentCard parent-title="Dashboard" title="Create Issue" class="relative">
                 <div class="absolute top-4 right-4">
                     <v-icon color="red-darken-2" icon="mdi-close" size="large" @click="showIssueForm = false"></v-icon>

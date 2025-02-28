@@ -52,10 +52,10 @@ onMounted(() => {
         sidebarMenu.value = [ { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }, { title: "Residents", icon: HelpIcon, to: "/residents" } ]
     } else if(user.type == '2') {
         selectedMenu.value = "Issues"
-        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Residents", icon: HelpIcon, to: "/residents" } ]
+        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" }, { title: "Residents", icon: HelpIcon, to: "/residents" } ]
     } else if(user.type == '1') {
-        selectedMenu.value = "Issues"
-        sidebarMenu.value = [{ title: "Issues", icon: HelpIcon, to: "/issues" }, { title: "Appointments", icon: MoodHappyIcon, to: "/appointments" },{ title: "Residents", icon: HelpIcon, to: "/residents" } ,{ title: "Users", icon: HelpIcon, to: "/users" } ]
+        selectedMenu.value = "Users"
+        sidebarMenu.value = [{ title: "Users", icon: HelpIcon, to: "/users" } , { title: "Residents", icon: HelpIcon, to: "/residents" } ]
     }
 })
 </script>
@@ -97,7 +97,7 @@ onMounted(() => {
     </v-navigation-drawer>
     <!------Header-------->
     <v-app-bar elevation="0" height="70">
-        <div class="d-flex align-center justify-space-between w-100">
+        <div class="d-flex align-center justify-end  w-full px-10">
             <div>
                 <v-btn class="hidden-lg-and-up ms-md-3 ms-sm-5 ms-3 text-muted" @click="sDrawer = !sDrawer" icon
                     variant="flat" size="small">
@@ -106,7 +106,7 @@ onMounted(() => {
                 <!-- Notification -->
 
             </div>
-            <div>
+            <div class="flex items-center justify-end mr-10">  
                 <!-- Upgrade button -->
                 <LayoutFullVerticalHeaderNotificationDD class="mx-3" />
                 <!-- User Profile -->

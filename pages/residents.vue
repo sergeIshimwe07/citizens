@@ -139,8 +139,8 @@ const download = computed(() => {
                         <template #item-action="item">
                             <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showUserForm = true"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" @click="showUserForm = true" icon="mdi-delete-forever"
-                                size="large"></v-icon>
+                            <!-- <v-icon color="red-darken-3" @click="showUserForm = true" icon="mdi-delete-forever"
+                                size="large"></v-icon> -->
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">

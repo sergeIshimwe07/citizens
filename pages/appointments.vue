@@ -132,11 +132,7 @@ function requestAppointment() {
     http.fetch("createAppointment", {
         method: "post",
         body: {
-            type: mentorType.value,
-            residents: resident.value,
-            date: formattedStartDate.value,
-            time: time.value,
-            status: 0
+            type: mentorType.value
         }
     })
         .then(res => {
@@ -258,9 +254,9 @@ const download = computed(() => {
                     <v-col class="flex" cols="12" md="3">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
-                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
+                            <!-- <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
                                 Export
-                            </v-btn>
+                            </v-btn> -->
                         </form>
                     </v-col>
                     <v-col v-if="!showForm && (user?.type == '4' || user?.type == '3')" class="flex" cols="12" md="3">
@@ -284,8 +280,8 @@ const download = computed(() => {
                         <template #item-action="item">
                             <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showForm = true"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" @click="showForm = true" icon="mdi-delete-forever"
-                                size="large"></v-icon>
+                            <!-- <v-icon color="red-darken-3" @click="showForm = true" icon="mdi-delete-forever"
+                                size="large"></v-icon> -->
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">
