@@ -67,6 +67,7 @@ const {
       rules.required("Please enter phone number"),
       rules.min(10)("Phone number has to be 10 characters"),
       rules.max(10)("Phone number has to be 10 characters"),
+      (value: string) => /^\d+$/.test(value) || "Phone number must contain only digits",
     ],
   },
   email: {

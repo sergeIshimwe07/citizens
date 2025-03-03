@@ -34,7 +34,7 @@ const headers: Header[] = [
     { text: "E-mail", value: "email", sortable: true },
     { text: "User Type", value: "type", sortable: true },
     { text: "Status", value: "Status", sortable: true },
-    // { text: "Action", value: "action", sortable: false },
+    { text: "Action", value: "action", sortable: false },
 ]
 const user: any = JSON.parse(localStorage.getItem("logger"))
 
@@ -181,6 +181,23 @@ onMounted(() => {
     getAllUsers()
     getMentorshipTypes()
 })
+function changeUserStatus(item: any, status: string) {
+    loading.value = true
+    http.fetch("changeUserStatus", {
+        method: "post",
+        body: {
+            id: item.id,
+            status: status
+        }
+    })  
+        .then(res => {
+            useToast().success(res.message);
+            getAllUsers()
+        })
+        .catch(err => {
+            useToast().error(err.data.message);
+        })
+}
 const download = computed(() => {
     return config.public.apiUrl + "getAttendance/1/0/" + token
 })
@@ -212,10 +229,12 @@ const download = computed(() => {
                             </v-chip>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showUserForm = true"
-                                icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" @click="showUserForm = true" icon="mdi-delete-forever"
-                                size="large"></v-icon>
+                            <v-btn v-if="item.status !== '1'" color="success" @click="changeUserStatus(item, '1')">
+                                Enable User
+                            </v-btn>
+                            <v-btn v-if="item.status === '1'" color="error" @click="changeUserStatus(item, '2')">
+                                Disable User
+                            </v-btn>
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">

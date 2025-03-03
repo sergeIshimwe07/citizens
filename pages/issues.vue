@@ -19,6 +19,7 @@ const showIssueForm = ref(false)
 const showDetails = ref(false)
 const btnLoading = ref(false)
 const loading = ref(false)
+const dialog = ref(false)
 const headers: Header[] = [
     { text: "Citizen", value: "citizen", sortable: true },
     { text: "Category", value: "category", sortable: true },
@@ -175,17 +176,46 @@ function getIssueCategories() {
             console.log(err.data.message);
         })
 }
+//delete issue
+function deleteIssue(id: number) {
+    http.fetch("deleteIssue", {
+        method: "post",
+        body: {
+            id
+        }
+    })
+        .then(res => {
+            dialog.value = false
+            useToast().success(res.message)
+            getAllIssues()
+        })
+        .catch(err => {
+            useToast().error(err.data.message)
+        })
+}
 onMounted(() => {
     getAllIssues()
     getIssueCategories()
 })
 const download = computed(() => {
-    return config.public.apiUrl + "getAttendance/1/0/" + token
+    return config.public.apiUrl + "getIssues/1/" + token
 })
 
 </script>
 <template>
     <v-row>
+        <v-dialog v-model="dialog" width="auto">
+            <v-card max-width="400" prepend-icon="mdi-alert-outline"
+                text="Are you sure you want to delete this appointment?"
+                title="Delete Appointment">
+                <template v-slot:actions>
+                    <div class="flex gap-2">
+                        <v-btn class="ms-auto" text="Cancel" @click="dialog = false"></v-btn>
+                        <v-btn class="ms-auto" @click="deleteIssue(itemToEdit.id)">Continue</v-btn>
+                    </div>
+                </template>
+            </v-card>
+        </v-dialog>
         <v-col>
             <UiParentCard parent-title="Dashboard" title="Issues List">
                 <v-row class="mb-4">
@@ -197,9 +227,9 @@ const download = computed(() => {
                     <v-col class="flex" cols="12" md="2">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
-                            <!-- <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
+                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
                                 Export
-                            </v-btn> -->
+                            </v-btn>
                         </form>
                     </v-col>
                     <v-col class="flex" cols="12" md="3">
@@ -220,8 +250,8 @@ const download = computed(() => {
                         <template #item-action="item">
                             <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true; showIssueForm = false"
                                 icon="mdi-eye-outline"></v-icon>
-                            <!-- <v-icon color="red-darken-3"  icon="mdi-delete-forever"
-                                size="large"></v-icon> -->
+                            <v-icon color="red-darken-3"  icon="mdi-delete-forever" @click="itemToEdit = item; dialog = true"
+                                size="large"></v-icon>
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">
@@ -250,7 +280,7 @@ const download = computed(() => {
                                     @click="showDetails = false">
                                     Close
                                 </v-btn>
-                                <v-menu v-if="user.role === '2'" bottom left>
+                                <v-menu v-if="user.type === '2'" bottom left>
                                     <template v-slot:activator="{ props }">
                                         <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
                                             class="mx-1" prepend-icon="mdi-delete">

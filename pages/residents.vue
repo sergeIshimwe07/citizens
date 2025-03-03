@@ -88,6 +88,24 @@ function getMentorshipTypes() {
             console.log(err.data.message);
         })
 }
+//change user status
+function changeUserStatus(item: any, status: string) {
+    loading.value = true
+    http.fetch("changeUserStatus", {
+        method: "post",
+        body: {
+            id: item.id,
+            status: status
+        }
+    })  
+        .then(res => {
+            useToast().success(res.message);
+            getAllUsers()
+        })
+        .catch(err => {
+            useToast().error(err.data.message);
+        })
+}
 onMounted(() => {
     getAllUsers()
     getMentorshipTypes()
@@ -110,9 +128,9 @@ const download = computed(() => {
                     <v-col class="flex" cols="12" md="5">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
-                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
+                            <!-- <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
                                 Export
-                            </v-btn>
+                            </v-btn> -->
                         </form>
                     </v-col>
                     <!-- <v-col class="flex" cols="12" md="3">
@@ -137,10 +155,12 @@ const download = computed(() => {
                             <p>{{ item.resolved_issues + '/' + item.total_issues }}</p>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showUserForm = true"
-                                icon="mdi-eye-outline"></v-icon>
-                            <!-- <v-icon color="red-darken-3" @click="showUserForm = true" icon="mdi-delete-forever"
-                                size="large"></v-icon> -->
+                            <v-btn v-if="item.status !== '1'" color="success" @click="changeUserStatus(item, '1')">
+                                Enable User
+                            </v-btn>
+                            <v-btn v-if="item.status === '1'" color="error" @click="changeUserStatus(item, '2')">
+                                Disable User
+                            </v-btn>
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">
