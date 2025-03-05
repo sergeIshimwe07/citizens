@@ -12,6 +12,7 @@ const http = useHttpRequest()
 const config = useRuntimeConfig()
 const token = localStorage.getItem("token")
 const search = ref("");
+const feedback = ref("");
 const lists = ref([]);
 const categories = ref([]);
 const itemToEdit = ref<any>(null)
@@ -26,6 +27,7 @@ const headers: Header[] = [
     { text: "Title", value: "title", sortable: true },
     { text: "Status", value: "status", sortable: true },
     { text: "Date", value: "created_at", sortable: true },
+    { text: "Feedback", value: "feedback", sortable: true },
     { text: "Action", value: "action", sortable: false },
 ]
 const user: any = JSON.parse(localStorage.getItem("logger"))
@@ -151,7 +153,8 @@ function changeIssueStatus(status = 1) {
         method: "post",
         body: {
             id: itemToEdit.value.id,
-            status
+            status,
+            feedback: feedback.value
         }
     })
         .then(res => {
@@ -206,8 +209,7 @@ const download = computed(() => {
     <v-row>
         <v-dialog v-model="dialog" width="auto">
             <v-card max-width="400" prepend-icon="mdi-alert-outline"
-                text="Are you sure you want to delete this appointment?"
-                title="Delete Appointment">
+                text="Are you sure you want to delete this appointment?" title="Delete Appointment">
                 <template v-slot:actions>
                     <div class="flex gap-2">
                         <v-btn class="ms-auto" text="Cancel" @click="dialog = false"></v-btn>
@@ -233,8 +235,8 @@ const download = computed(() => {
                         </form>
                     </v-col>
                     <v-col class="flex" cols="12" md="3">
-                        <v-btn @click="showIssueForm = true; showDetails = false" prepend-icon="mdi-plus" color="primary" class="mx-2"
-                            variant="tonal">
+                        <v-btn @click="showIssueForm = true; showDetails = false" prepend-icon="mdi-plus"
+                            color="primary" class="mx-2" variant="tonal">
                             New Issue
                         </v-btn>
                     </v-col>
@@ -248,10 +250,11 @@ const download = computed(() => {
                             </v-chip>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" size="30" @click="itemToEdit = item; showDetails = true; showIssueForm = false"
+                            <v-icon color="green-darken-3" size="30"
+                                @click="itemToEdit = item; showDetails = true; showIssueForm = false"
                                 icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3"  icon="mdi-delete-forever" @click="itemToEdit = item; dialog = true"
-                                size="large"></v-icon>
+                            <v-icon color="red-darken-3" icon="mdi-delete-forever"
+                                @click="itemToEdit = item; dialog = true" size="large"></v-icon>
                         </template>
                         <template #empty-message>
                             <div class="d-flex justify-center align-center py-3">
@@ -274,6 +277,12 @@ const download = computed(() => {
                             <p class="text-left text-sm text-gray-600 md:mb-5">
                                 {{ itemToEdit?.details }}
                             </p>
+                            <div class="flex flex-col my-4 group">
+                                <label for="details" class="text-gray-700 text-sm">Feedback</label>
+                                <textarea id="details" v-model="feedback" rows="4"
+                                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+                                    placeholder="Enter Feedback (Optional)"></textarea>
+                            </div>
                             <v-card-actions class="mt-5">
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" variant="outlined" class="mx-1" prepend-icon="mdi-close"
@@ -282,8 +291,8 @@ const download = computed(() => {
                                 </v-btn>
                                 <v-menu v-if="user.type === '2'" bottom left>
                                     <template v-slot:activator="{ props }">
-                                        <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined" color="success"
-                                            class="mx-1" prepend-icon="mdi-delete">
+                                        <v-btn :loading="btnLoading" elevation="10" v-bind="props" variant="outlined"
+                                            color="success" class="mx-1" prepend-icon="mdi-delete">
                                             Change Issue status
                                         </v-btn>
                                     </template>
@@ -291,7 +300,7 @@ const download = computed(() => {
                                     <v-list>
                                         <v-list-item @click="changeIssueStatus(1)" v-if="itemToEdit.status !== '1'">
                                             <v-list-item-title>{{ itemToEdit.status === '0' ? 'Activate' :
-                                                'Reopen'}}</v-list-item-title>
+                                                'Reopen' }}</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item v-if="itemToEdit.status !== '2'" @click="changeIssueStatus(2)">
                                             <v-list-item-title>Close Issue</v-list-item-title>

@@ -80,9 +80,14 @@ const {
         $rules: [rules.required("Please enter your full names")],
     },
     phone: {
-        $value: "",
-        $rules: [rules.required("Please enter phone number")],
-    },
+    $value: "",
+    $rules: [
+      rules.required("Please enter phone number"),
+      rules.min(10)("Phone number has to be 10 characters"),
+      rules.max(10)("Phone number has to be 10 characters"),
+      (value: string) => /^\d+$/.test(value) || "Phone number must contain only digits",
+    ],
+  },
     email: {
         $value: "",
         $rules: [rules.required("Please enter email address")],
@@ -195,6 +200,7 @@ function changeUserStatus(item: any, status: string) {
             getAllUsers()
         })
         .catch(err => {
+            loading.value = false
             useToast().error(err.data.message);
         })
 }

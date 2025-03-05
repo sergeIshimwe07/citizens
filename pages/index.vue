@@ -78,26 +78,25 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div>
-    <div class="bg-white md:overflow-hidden">
+  <div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white md:overflow-hidden shadow-lg px-16 rounded-xl">
       <div class="px-4 py-20 md:py-4">
         <div class="md:max-w-6xl md:mx-auto">
           <div class="md:flex md:flex-wrap">
-            <div class="md:w-1/2  md:text-left md:pt-28">
+            <div class="md:w-full md:text-center md:pt-28">
               <h1 class="font-bold text-primary text-3xl md:text-5xl leading-tight mb-4">
                 Login
               </h1>
-              <p class="text-left md:text-xl text-gray-600 md:mb-12 mt-2">Welcome back, login to your account
+              <p class="text-center md:text-xl text-gray-600 md:mb-12 mt-2">Welcome back, login to your account
               </p>
-              <form @submit.prevent="handleSubmit" class="  md:text-sm md:pr-48">
+              <form @submit.prevent="handleSubmit" class="md:text-sm">
                 <div class="flex flex-col my-4 group">
-                  <label for="email" class="text-gray-700 text-sm  group-focus:text-orange-400">E-mail/Phone Number
+                  <label for="email" class="text-gray-700 text-sm group-focus:text-orange-400">E-mail/Phone Number
                   </label>
                   <input type="email" name="email" id="email" v-model="form.email.$value" @blur="form.email.$validate()"
                     class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
                     placeholder="Enter your email or phone number">
                   <FormErrors :errors="form.email.$errors" class="p-error" />
-
                 </div>
                 <div class="flex flex-col my-4">
                   <label for="password" class="text-gray-700 text-sm">Password</label>
@@ -112,10 +111,8 @@ async function handleSubmit() {
                       <EyeOffIcon @click="toggle(false)" size="18" class="text-gray-400"
                         :class="!show ? 'hidden' : ''" />
                     </div>
-
                   </div>
                   <FormErrors :errors="form.password.$errors" class="p-error" />
-
                 </div>
                 <div class="my-4 flex items-center justify-end space-x-4">
                   <v-btn @click.prevent="handleSubmit" :disabled="loading" :loading="loading" color="primary" rounded="xl"

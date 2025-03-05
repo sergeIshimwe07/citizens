@@ -103,6 +103,7 @@ function changeUserStatus(item: any, status: string) {
             getAllUsers()
         })
         .catch(err => {
+            loading.value = false
             useToast().error(err.data.message);
         })
 }
@@ -111,7 +112,7 @@ onMounted(() => {
     getMentorshipTypes()
 })
 const download = computed(() => {
-    return config.public.apiUrl + "getAttendance/1/0/" + token
+    return config.public.apiUrl + "getActiveResidents/1/" + token
 })
 
 </script>
@@ -128,9 +129,9 @@ const download = computed(() => {
                     <v-col class="flex" cols="12" md="5">
                         <form :action="download" method="post" target="_blank">
                             <input type="hidden" v-model="formattedStartDate">
-                            <!-- <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
+                            <v-btn prepend-icon="mdi-microsoft-excel" color="success" class="mx-2" type="submit">
                                 Export
-                            </v-btn> -->
+                            </v-btn>
                         </form>
                     </v-col>
                     <!-- <v-col class="flex" cols="12" md="3">

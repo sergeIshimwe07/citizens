@@ -108,7 +108,7 @@ onMounted(() => {
             </div>
             <div class="flex items-center justify-end mr-10">  
                 <!-- Upgrade button -->
-                <LayoutFullVerticalHeaderNotificationDD class="mx-3" />
+                <LayoutFullVerticalHeaderNotificationDD class="mx-3" v-if="false" />
                 <!-- User Profile -->
                 <LayoutFullVerticalHeaderProfileDD />
             </div>

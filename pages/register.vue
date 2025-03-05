@@ -92,78 +92,64 @@ const {
 });
 </script>
 <template>
-  <div>
-    <div class="bg-white md:overflow-hidden">
-      <div class="px-4 py-20 md:py-4">
-        <div class="md:max-w-6xl md:mx-auto">
-          <div class="md:flex md:flex-wrap">
-            <div class="md:w-1/2  md:text-left md:pt-28">
-              <h1 class="font-bold text-primary text-3xl md:text-5xl leading-tight mb-4">
-                Sign Up
-              </h1>
-              <p class="text-left md:text-xl text-gray-600 md:mb-12 mt-2">Fill this form to create resident account
-              </p>
-              <form @submit.prevent="createAccount" class="md:text-sm md:pr-48">
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="names" id="names" v-model="form.names.$value"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your full names ">
-                  <FormErrors :errors="form.names.$errors" class="p-error" />
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="phone" id="phone" v-model="form.phone.$value"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter phone number">
-                  <FormErrors :errors="form.phone.$errors" class="p-error" />
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="email" id="email" v-model="form.email.$value"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your email address">
-                  <FormErrors :errors="form.email.$errors" class="p-error" />
-                </div>
-                <div class="flex flex-col my-4 group">
-                  <input type="text" name="isibo" id="isibo" v-model="form.isibo.$value"
-                    class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                    placeholder="Enter your isibo">
-                  <FormErrors :errors="form.isibo.$errors" class="p-error" />
-                </div>
-                <div class="flex flex-col my-4">
-                  <div x-data="{ show: true }" class="relative flex items-center mt-2">
-                    <input :type="show ? 'text' : 'password'" name="password" id="password"
-                      v-model="form.password.$value" @blur="form.password.$validate()"
-                      class="flex-1 p-2 pr-10 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
-                      placeholder="Enter your password">
-                    <div
-                      class="absolute right-2 bg-transparent cursor-pointer flex items-center justify-center text-gray-700">
-                      <EyeIcon @click="toggle(true)" size="18" class="text-gray-400" :class="show ? 'hidden' : ''" />
-                      <EyeOffIcon @click="toggle(false)" size="18" class="text-gray-400"
-                        :class="!show ? 'hidden' : ''" />
-                    </div>
-
-                  </div>
-                  <FormErrors :errors="form.password.$errors" class="p-error" />
-
-                </div>
-                <div class="my-4 flex items-center justify-end space-x-4">
-                  <v-btn @click.prevent="createAccount" :disabled="dataLoading" :loading="dataLoading" rounded="xl"
-                    color="primary" size="large" block flat>
-                    Create account
-                  </v-btn>
-                </div>
-                <v-row justify="center">
-                  <v-btn to="/" color="primary" size="large" variant="text">
-                    Back to Login
-                  </v-btn>
-                </v-row>
-              </form>
+  <div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-xl px-16 shadow-md w-full max-w-md">
+      <h1 class="font-bold text-primary text-3xl md:text-5xl leading-tight mb-4 text-center">
+        Sign Up
+      </h1>
+      <p class="text-center md:text-xl text-gray-600 md:mb-12 mt-2">Fill this form to create resident account</p>
+      <form @submit.prevent="createAccount" class="md:text-sm">
+        <div class="flex flex-col my-4 group">
+          <input type="text" name="names" id="names" v-model="form.names.$value"
+            class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+            placeholder="Enter your full names ">
+          <FormErrors :errors="form.names.$errors" class="p-error" />
+        </div>
+        <div class="flex flex-col my-4 group">
+          <input type="text" name="phone" id="phone" v-model="form.phone.$value"
+            class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+            placeholder="Enter phone number">
+          <FormErrors :errors="form.phone.$errors" class="p-error" />
+        </div>
+        <div class="flex flex-col my-4 group">
+          <input type="text" name="email" id="email" v-model="form.email.$value"
+            class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+            placeholder="Enter your email address">
+          <FormErrors :errors="form.email.$errors" class="p-error" />
+        </div>
+        <div class="flex flex-col my-4 group">
+          <input type="text" name="isibo" id="isibo" v-model="form.isibo.$value"
+            class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+            placeholder="Enter your isibo">
+          <FormErrors :errors="form.isibo.$errors" class="p-error" />
+        </div>
+        <div class="flex flex-col my-4">
+          <div x-data="{ show: true }" class="relative flex items-center mt-2">
+            <input :type="show ? 'text' : 'password'" name="password" id="password"
+              v-model="form.password.$value" @blur="form.password.$validate()"
+              class="flex-1 p-2 pr-10 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+              placeholder="Enter your password">
+            <div
+              class="absolute right-2 bg-transparent cursor-pointer flex items-center justify-center text-gray-700">
+              <EyeIcon @click="toggle(true)" size="18" class="text-gray-400" :class="show ? 'hidden' : ''" />
+              <EyeOffIcon @click="toggle(false)" size="18" class="text-gray-400"
+                :class="!show ? 'hidden' : ''" />
             </div>
           </div>
+          <FormErrors :errors="form.password.$errors" class="p-error" />
         </div>
-      </div>
-      <svg class="fill-current text-white hidden md:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 160">
-        <path fill-opacity="1" d="M0,224L1440,32L1440,320L0,320Z"></path>
-      </svg>
+        <div class="my-4 flex items-center justify-end space-x-4">
+          <v-btn @click.prevent="createAccount" :disabled="dataLoading" :loading="dataLoading" rounded="xl"
+            color="primary" size="large" block flat>
+            Create account
+          </v-btn>
+        </div>
+        <v-row justify="center">
+          <v-btn to="/" color="primary" size="large" variant="text">
+            Back to Login
+          </v-btn>
+        </v-row>
+      </form>
     </div>
   </div>
 </template>

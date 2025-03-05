@@ -23,6 +23,7 @@ const menu = ref(false)
 const isSending = ref(false)
 const resident = ref<any>("")
 const mentorType = ref<any>("")
+const feedback = ref<any>("")
 const time = ref("")
 const itemToEdit = ref<any>(null)
 const headers: Header[] = [
@@ -31,6 +32,7 @@ const headers: Header[] = [
     { text: "Time", value: "time", sortable: true },
     { text: "Date created", value: "created_at", sortable: true },
     { text: "Type", value: "type", sortable: true },
+    { text: "Feedback", value: "feedback", sortable: true },
     { text: "Status", value: "status", sortable: true },
     { text: "Action", value: "action", sortable: false },
 ]
@@ -158,7 +160,8 @@ function setAppointmentMentor() {
             residents: resident.value,
             date: formattedStartDate.value,
             time: time.value,
-            status: 1
+            status: 1,
+            feedback: feedback.value
         }
     })
         .then(res => {
@@ -176,18 +179,20 @@ function setAppointmentMentor() {
 
 function approveAppointment(status = 1) {
     btnLoading.value = true
+    console.log(itemToEdit.value);
+    
     let temp = {
         date: "",
         time: "",
-        citizen_id: "",
+        citizen_id: itemToEdit.value.citizen_id,
         id: itemToEdit.value.id,
         status
     }
     if (status === 1) {
         temp.date = formattedStartDate.value
         temp.time = time.value
-        temp.citizen_id = resident.value
-    }
+        temp.citizen_id = resident.value ? resident.value : itemToEdit.value.citizen_id
+    } 
     http.fetch("updateAppointment", {
         method: "post",
         body: {
@@ -263,8 +268,7 @@ const download = computed(() => {
     <v-row>
         <v-dialog v-model="dialog" width="auto">
             <v-card max-width="400" prepend-icon="mdi-alert-outline"
-                text="Are you sure you want to delete this appointment?"
-                title="Delete Appointment">
+                text="Are you sure you want to delete this appointment?" title="Delete Appointment">
                 <template v-slot:actions>
                     <div class="flex gap-2">
                         <v-btn class="ms-auto" text="Cancel" @click="dialog = false"></v-btn>
@@ -305,9 +309,10 @@ const download = computed(() => {
                             </v-chip>
                         </template>
                         <template #item-action="item">
-                            <v-icon color="green-darken-3" v-if="user?.type === '3'" size="30" @click="itemToEdit = item; showForm = true"
-                                icon="mdi-eye-outline"></v-icon>
-                            <v-icon color="red-darken-3" v-else-if="user?.type === '4'" @click="itemToEdit = item; dialog = true" icon="mdi-delete-forever"
+                            <v-icon color="green-darken-3" v-if="user?.type === '3'" size="30"
+                                @click="itemToEdit = item; showForm = true" icon="mdi-eye-outline"></v-icon>
+                            <v-icon color="red-darken-3" v-else-if="user?.type === '4'"
+                                @click="itemToEdit = item; dialog = true" icon="mdi-delete-forever"
                                 size="large"></v-icon>
                             <div>-</div>
                         </template>
@@ -381,6 +386,12 @@ const download = computed(() => {
                                             class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700"
                                             min="09:00" max="18:00" value="00:00" required />
                                     </div>
+                                    <div class="flex flex-col my-4 group">
+                                        <label for="details" class="text-gray-700 text-sm">Feedback</label>
+                                        <textarea id="details" v-model="feedback" rows="4"
+                                            class="mt-1 p-2 border border-gray-300 focus:outline-none focus:ring-0 focus:border-warning-500 rounded text-sm text-gray-900"
+                                            placeholder="Enter Feedback (Optional)"></textarea>
+                                    </div>
                                 </form>
                                 <v-menu v-model="menu" :close-on-content-click="false" location="bottom">
                                     <template v-slot:activator="{ props }">
@@ -389,7 +400,8 @@ const download = computed(() => {
                                         </v-btn>
                                     </template>
                                     <v-card min-width="300">
-                                        <v-date-picker v-model="startDate" hide-header :min="new Date().toISOString().substr(0, 10)"
+                                        <v-date-picker v-model="startDate" hide-header
+                                            :min="new Date().toISOString().substr(0, 10)"
                                             show-adjacent-months></v-date-picker>
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
